@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Machine Learner — Evolving the Perfect Shot</title>
+  <meta name="description" content="A genetic algorithm that learns, attempt by attempt, to hit a six, sink a basket and throw a bullseye.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-top">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg></span>
+      <h1>Machine Learner</h1>
+      <span class="sub">evolving the perfect shot</span>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist"></nav>
+  </header>
+
+  <main class="layout">
+    <section class="stage">
+      <div class="viewport">
+        <canvas id="scene"></canvas>
+        <div class="hud hud-tl"><span id="hudGoal" class="strong"></span><span class="dot">·</span><span id="hudView" class="muted"></span></div>
+        <div class="hud hud-tr"><span id="hudAttempt" class="strong"></span><span class="dot">·</span><span id="hudKind" class="muted"></span></div>
+        <div class="banner" id="banner"></div>
+        <div class="hud hud-bc" id="hudReadout"></div>
+      </div>
+
+      <div class="bottom">
+        <div class="card statcard">
+          <div class="phase-row"><span class="phase" id="phase"></span><span class="rate" id="rateTxt"></span></div>
+          <div class="meter"><i id="rateBar"></i></div>
+          <div class="stats" id="stats"></div>
+        </div>
+        <div class="card plot">
+          <div class="card-h">Learning curve
+            <span class="legend">
+              <span><i style="background:#f5c542"></i>success</span>
+              <span><i class="ln" style="background:#4fd1c5"></i>best</span>
+              <span><i class="ln" style="background:#f472b6"></i>rate</span>
+            </span>
+          </div>
+          <div class="cbox"><canvas id="chart"></canvas></div>
+        </div>
+        <div class="card plot">
+          <div class="card-h" id="miniTitle">Shot map</div>
+          <div class="cbox"><canvas id="mini"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="controls">
+        <button id="btnRun" class="primary">Pause</button>
+        <button id="btnStep">Step</button>
+        <button id="btnBest">Replay best</button>
+        <button id="btnReset" class="danger">Reset</button>
+      </div>
+
+      <div class="card">
+        <div class="card-h">Environment <span class="tag">you control</span></div>
+        <div id="envControls"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-h">Learner</div>
+        <div class="ctrl">
+          <label><span>Playback speed</span><output id="speedOut">1×</output></label>
+          <input id="speed" type="range" min="0.25" max="4" step="0.25" value="1">
+        </div>
+        <label class="switch"><input id="turbo" type="checkbox"><span class="track"></span><span>Turbo <span class="muted">· no animation</span></span></label>
+        <label class="switch"><input id="guided" type="checkbox" checked><span class="track"></span><span>Sport strategy <span class="muted">· coached</span></span></label>
+        <details class="adv">
+          <summary>Advanced</summary>
+        <div class="ctrl">
+          <label><span>Population size</span><output id="popOut">24</output></label>
+          <input id="pop" type="range" min="8" max="60" step="1" value="24">
+        </div>
+        <div class="ctrl">
+          <label><span>Base mutation</span><output id="mutOut">0.15</output></label>
+          <input id="mut" type="range" min="0.02" max="0.4" step="0.01" value="0.15">
+        </div>
+        </details>
+      </div>
+
+      <div class="card details">
+        <div class="seg" role="tablist">
+          <button class="active" data-pane="paneGenes">Genome</button>
+          <button data-pane="paneLog">Log</button>
+          <button data-pane="paneHow">How it learns</button>
+        </div>
+        <div class="pane active" id="paneGenes">
+          <p class="hint">Bar = this attempt · <b class="gold">|</b> = best so far</p>
+          <div id="genes"></div>
+        </div>
+        <div class="pane" id="paneLog"><ol id="log" class="log"></ol></div>
+        <div class="pane how" id="paneHow">
+          <h3>General strategy</h3>
+          <ol>
+            <li>Each attempt is a <b>genome</b>: genes in 0…1 that decode into the athlete's movement.</li>
+            <li>A <b>fitness</b> score rewards getting closer to the goal, with a big bonus for success.</li>
+            <li>Every new attempt is bred <b>immediately</b>: tournament selection, crossover and Gaussian mutation.</li>
+            <li>A child that beats the weakest member replaces it, so the best attempt is never lost.</li>
+            <li>Mutation size <b>adapts</b>. If learning stalls, random <b>immigrants</b> are injected.</li>
+          </ol>
+          <h3 id="howSport">Sport-specific strategy</h3>
+          <ul id="howList"></ul>
+          <p class="hint">About half of the new attempts use this "coach's feedback". Switch the strategy off to compare against a pure GA.</p>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
